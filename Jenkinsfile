@@ -33,7 +33,7 @@
                                 '''
                             }
                         }
-                                                stage('e2e') {                     
+                        stage('e2e') {                     
                             agent {
                                 docker {
                                     image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
