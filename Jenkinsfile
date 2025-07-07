@@ -40,10 +40,10 @@ pipeline {
       steps {
         sh '''
           npm ci
-          npx playwright install --with-deps
-          npx serve -s build -l 5000 &
-          sleep 5
-          npx playwright test --reporter=junit
+           npm install serve
+           node_modules/.bin/serve -s build &
+           sleep 10
+           npx playwright test
         '''
       }
     }
