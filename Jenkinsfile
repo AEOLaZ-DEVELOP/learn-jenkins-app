@@ -69,7 +69,7 @@
                                                 keepAll: false, 
                                                 reportDir: 'playwright-report', 
                                                 reportFiles: 'index.html', 
-                                                reportName: 'Playwright HTML Report', 
+                                                reportName: 'Playwright Local', 
                                                 reportTitles: '', 
                                                 useWrapperFileDirectly: true]
                                             )
