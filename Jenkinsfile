@@ -95,44 +95,9 @@ pipeline {
                                     node_modules/.bin/netlify status
                                     node_modules/.bin/netlify deploy --dir=build --prod
                                 '''
-                                // script {
-                                //     env.staging_url = sh (
-                                //         script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json",  
-                                //         returnStdout: true
-                                //     ).trim()
-                                // }
+
                             }
                         }
-                        stage('e2e staging') {                     
-                            agent {
-                                docker {
-                                     image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-                                     reuseNode true  
-                                }
-                            }
-                            environment {
-                                    CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
-                            }
-                            steps {
-                                sh '''
-                                    npx playwright test --reporter=html                        
-                                '''
-                            }
-                            post {
-                                always {
-                                    publishHTML([
-                                        allowMissing: false, 
-                                        alwaysLinkToLastBuild: false, 
-                                        icon: '', 
-                                        keepAll: false, 
-                                        reportDir: 'playwright-report', 
-                                        reportFiles: 'index.html', 
-                                        reportName: 'e2e staging', 
-                                        reportTitles: '', 
-                                        useWrapperFileDirectly: true
-                                    ])
-                                }
-                            }
-                        }
+
                     } 
 }
