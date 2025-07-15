@@ -11,7 +11,6 @@ pipeline {
                             agent {
                                 docker {
                                     image 'node:18-alpine'
-                                    stash includes: 'build/**', name: 'build-artifact'
                                     reuseNode true
                                 }
                             }
@@ -23,6 +22,7 @@ pipeline {
                                     npm ci
                                     npm run build
                                     ls -la
+                                    stash includes: 'build/**', name: 'build-artifact'
                                 '''
                             }
                         }
