@@ -1,11 +1,12 @@
-                pipeline {
+pipeline {
                     agent any    
                     environment {                                                               
-                        NETLIFY_SITE_ID = '6e0e72ab-213d-41ee-8920-75ed9c86bf89'                
-                        NETLIFY_AUTH_TOKEN = credentials('netlify-token')                       
+                        NETLIFY_SITE_ID = 'f0a528e5-4c88-46d0-b60b-f999e41f4092'                
+                        NETLIFY_AUTH_TOKEN = credentials('netlify_token')                                                                                                                    📌 ผลลัพธ์:
+            
                     }                            
                     stages {
-                        stage('build') {                     
+                        stage('Build') {                     
                             agent {
                                 docker {
                                     image 'node:18-alpine'   
@@ -23,7 +24,61 @@
                                 '''
                             }
                         }
-                        stage('deploy staging') {                     
+                        stage('Tests') {
+                            parallel {
+                                stage('unit test') {                     
+                                    agent {
+                                        docker {
+                                            image 'node:18-alpine'   
+                                            reuseNode true           
+                                        }
+                                    }
+                                    steps {
+                                        sh '''
+                                            test -f build/index.html                    
+                                            npm test
+                                        '''
+                                    }
+                                    post {                                                                          
+                                        always {
+                                            junit 'jest-results/junit.xml'                                      
+                                        }
+                                    }
+                                }
+                                stage('e2e') {                     
+                                    agent {
+                                        docker {
+                                            image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                                            reuseNode true  
+                                        }
+                                    }
+                                    steps {
+                                        sh '''
+                                            npm install serve
+                                            node_modules/.bin/serve -s build &                          
+                                            sleep 10
+                                            npx playwright test --reporter=html                        
+                                        '''
+                                    }
+                                    post {
+                                        always {
+                                            publishHTML(                                                        
+                                                [allowMissing: false, 
+                                                alwaysLinkToLastBuild: false, 
+                                                icon: '', 
+                                                keepAll: false, 
+                                                reportDir: 'playwright-report', 
+                                                reportFiles: 'index.html', 
+                                                reportName: 'Playwright HTML Report', 
+                                                reportTitles: '', 
+                                                useWrapperFileDirectly: true]
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        stage('Deploy') {                     
                             agent {
                                 docker {
                                     image 'node:18-alpine'   
@@ -32,17 +87,12 @@
                             }
                             steps {
                                 sh '''
-                                    npm install netlify-cli node-jq
+                                    npm install netlify-cli
                                     node_modules/.bin/netlify --version 
                                     echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
                                     node_modules/.bin/netlify status
+
                                 '''
-                                // script {
-                                //     env.staging_url = sh (
-                                //         script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json",        
-                                //         returnStdout: true
-                                //     ).trim()
-                                // }
                             }
                         }
                     }    
