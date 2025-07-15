@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent none
 
     environment {
         NETLIFY_SITE_ID = 'f0a528e5-4c88-46d0-b60b-f999e41f4092'
@@ -7,11 +7,11 @@ pipeline {
     }
 
     stages {
-
         stage('Build') {
             agent {
                 docker {
                     image 'node:18-alpine'
+                    args '-v $WORKSPACE:/workspace -w /workspace'
                     reuseNode true
                 }
             }
@@ -22,7 +22,7 @@ pipeline {
                     npm --version
                     npm ci
                     npm run build
-                    ls -la
+                    ls -la build
                 '''
             }
         }
@@ -33,13 +33,13 @@ pipeline {
                     agent {
                         docker {
                             image 'node:18-alpine'
+                            args '-v $WORKSPACE:/workspace -w /workspace'
                             reuseNode true
                         }
                     }
-
                     steps {
                         sh '''
-                            #test -f build/index.html
+                            test -f build/index.html
                             npm test
                         '''
                     }
@@ -54,22 +54,29 @@ pipeline {
                     agent {
                         docker {
                             image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                            args '-v $WORKSPACE:/workspace -w /workspace'
                             reuseNode true
                         }
                     }
-
                     steps {
                         sh '''
                             npm install serve
                             node_modules/.bin/serve -s build &
                             sleep 10
-                            npx playwright test  --reporter=html
+                            npx playwright test --reporter=html
                         '''
                     }
-
                     post {
                         always {
-                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright Local', reportTitles: '', useWrapperFileDirectly: true])
+                            publishHTML([
+                                allowMissing: false,
+                                alwaysLinkToLastBuild: false,
+                                keepAll: false,
+                                reportDir: 'playwright-report',
+                                reportFiles: 'index.html',
+                                reportName: 'Playwright Local',
+                                useWrapperFileDirectly: true
+                            ])
                         }
                     }
                 }
@@ -80,6 +87,7 @@ pipeline {
             agent {
                 docker {
                     image 'node:18-alpine'
+                    args '-v $WORKSPACE:/workspace -w /workspace'
                     reuseNode true
                 }
             }
@@ -89,7 +97,7 @@ pipeline {
                     node_modules/.bin/netlify --version
                     echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
                     node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --dir=build --prod
+                    node_modules/.bin/netlify deploy --dir=build
                 '''
             }
         }
@@ -98,23 +106,29 @@ pipeline {
             agent {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    args '-v $WORKSPACE:/workspace -w /workspace'
                     reuseNode true
                 }
             }
-
             environment {
-                CI_ENVIRONMENT_URL = 'PUT YOUR NETLIFY SITE URL HERE'
+                CI_ENVIRONMENT_URL = 'https://jazzy-melomakarona-37ea40.netlify.app'
             }
-
             steps {
                 sh '''
-                    npx playwright test  --reporter=html
+                    npx playwright test --reporter=html
                 '''
             }
-
             post {
                 always {
-                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright E2E', reportTitles: '', useWrapperFileDirectly: true])
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: false,
+                        keepAll: false,
+                        reportDir: 'playwright-report',
+                        reportFiles: 'index.html',
+                        reportName: 'Playwright E2E',
+                        useWrapperFileDirectly: true
+                    ])
                 }
             }
         }
