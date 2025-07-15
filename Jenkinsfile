@@ -34,7 +34,9 @@ pipeline {
                   }
             }
             steps {
-                                  unstash 'build-artifact'
+                dir("${env.WORKSPACE}") {
+                        unstash 'build-artifact'
+                    }
                sh '''
                   echo '---deploy stage---'
                   npm install netlify-cli node-jq
