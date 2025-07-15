@@ -16,7 +16,7 @@ pipeline {
                             }
                             steps {
                                 sh '''
-                                    cat /etc/hostsname
+                                    cat /etc/hostname
                                     node --version
                                     npm --version
                                     npm ci
