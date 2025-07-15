@@ -7,63 +7,30 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
-            steps {
-                sh '''
-                    echo "🧱 Building..."
-                    node --version
-                    npm --version
-                    npm ci
-                    npm run build
-                    ls -la
-                '''
-                stash includes: 'build/**', name: 'build-artifact'
-            }
+        stage('Build & Deploy') {
+    agent {
+        docker {
+            image 'node:18-alpine'
+            reuseNode true
         }
+    }
+    steps {
+        sh '''
+            echo "🚧 Building..."
+            npm ci
+            npm run build
 
-        stage('Deploy to Netlify') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
-            steps {
-                unstash 'build-artifact'
-                sh '''
-                    echo "📦 Deploy stage started..."
+            echo "📦 Installing netlify-cli"
+            npm install netlify-cli
 
-                    # ตรวจสอบ working directory
-                    echo "📁 Current workspace: $PWD"
-                    ls -la build || echo "❌ Build folder not found!"
+            echo "🔐 Setting token and linking"
+            export NETLIFY_AUTH_TOKEN=$NETLIFY_AUTH_TOKEN
+            node_modules/.bin/netlify link --id=$NETLIFY_SITE_ID
 
-                    # ติดตั้ง CLI
-                    echo "🛠 Installing netlify-cli + node-jq"
-                    npm install netlify-cli node-jq
-
-                    # Export token ให้ CLI อ่านได้
-                    export NETLIFY_AUTH_TOKEN=$NETLIFY_AUTH_TOKEN
-                    echo "TOKEN=$NETLIFY_AUTH_TOKEN"    
-
-                    echo "🔗 Linking project"
-                    node_modules/.bin/netlify link --id=$NETLIFY_SITE_ID || echo "❌ Link failed"
-
-                    echo "🚀 Deploying..."
-                    node_modules/.bin/netlify deploy \
-                      --dir=build \
-                      --prod \
-                      --json \
-                      --debug \
-                      --auth=$NETLIFY_AUTH_TOKEN \
-                      --site=$NETLIFY_SITE_ID || echo "❌ Deploy failed"
-                '''
-            }
-        }
+            echo "🚀 Deploying"
+            node_modules/.bin/netlify deploy --dir=build --prod --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
+        '''
+    }
+}
     }
 }
