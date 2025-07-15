@@ -11,8 +11,7 @@ pipeline {
                             agent {
                                 docker {
                                     image 'node:18-alpine'
-                                    args "-v '${env.WORKSPACE}/build:/build' -w /build"
-
+                                    stash includes: 'build/**', name: 'build-artifact'
                                     reuseNode true
                                 }
                             }
@@ -39,6 +38,7 @@ pipeline {
             steps {
                sh '''
                   echo '---deploy stage---'
+                  unstash 'build-artifact'
                   npm install netlify-cli node-jq
                   node_modules/.bin/netlify --version 
                   echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
