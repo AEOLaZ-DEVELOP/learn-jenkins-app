@@ -2,8 +2,8 @@ pipeline {
     agent none
 
     environment {
-        NETLIFY_SITE_ID = 'f0a528e5-4c88-4d60-b60b-f999e41f4092'
-        NETLIFY_AUTH_TOKEN = credentials('netlify-token')
+        NETLIFY_SITE_ID     = 'f0a528e5-4c88-4d60-b60b-f999e41f4092'
+        NETLIFY_AUTH_TOKEN  = credentials('netlify-token')  // อย่าลืม add ที่ Jenkins > Credentials
     }
 
     stages {
@@ -16,6 +16,7 @@ pipeline {
             }
             steps {
                 sh '''
+                    echo "🧱 Building..."
                     node --version
                     npm --version
                     npm ci
@@ -26,39 +27,40 @@ pipeline {
             }
         }
 
-        stage('deploy staging') {
+        stage('Deploy to Netlify') {
             agent {
                 docker {
-                image 'node:18-alpine'
-                args "-v $WORKSPACE:/workspace -w /workspace"
-                reuseNode true
+                    image 'node:18-alpine'
+                    reuseNode true
                 }
             }
             steps {
                 unstash 'build-artifact'
                 sh '''
-                echo "🌍 Current workspace: $PWD"
-echo "🔐 NETLIFY_SITE_ID=$NETLIFY_SITE_ID"
-echo "🔐 NETLIFY_AUTH_TOKEN=${NETLIFY_AUTH_TOKEN:0:6}********"
-echo "--- 📦 Checking files ---"
-ls -la
-ls -la build || echo "❌ build folder missing"
-cat build/index.html || echo "⚠️ index.html not found"
+                    echo "📦 Deploy stage started..."
 
-echo "🛠 Installing netlify-cli + node-jq"
-npm install netlify-cli node-jq
+                    # ตรวจสอบ working directory
+                    echo "📁 Current workspace: $PWD"
+                    ls -la build || echo "❌ Build folder not found!"
 
-echo "🔗 netlify version check"
-node_modules/.bin/netlify --version
+                    # ติดตั้ง CLI
+                    echo "🛠 Installing netlify-cli + node-jq"
+                    npm install netlify-cli node-jq
 
-echo "🔗 Linking project to Netlify..."
-node_modules/.bin/netlify link --id=$NETLIFY_SITE_ID || echo "❌ link failed"
+                    # Export token ให้ CLI อ่านได้
+                    export NETLIFY_AUTH_TOKEN=$NETLIFY_AUTH_TOKEN
 
-echo "📦 Checking Netlify status..."
-node_modules/.bin/netlify status || echo "❌ status failed"
+                    # เชื่อม site กับ Netlify
+                    echo "🔗 Linking Netlify project..."
+                    node_modules/.bin/netlify link --id=$NETLIFY_SITE_ID || echo "❌ Link failed"
 
-echo "🚀 Deploying..."
-node_modules/.bin/netlify deploy --dir=build --prod --json --debug || echo "❌ deploy failed"
+                    # ตรวจสอบ status
+                    echo "📊 Netlify status:"
+                    node_modules/.bin/netlify status || echo "❌ Status failed"
+
+                    # Deploy
+                    echo "🚀 Deploying to Netlify..."
+                    node_modules/.bin/netlify deploy --dir=build --prod --json --debug || echo "❌ Deploy failed"
                 '''
             }
         }
