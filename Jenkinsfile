@@ -37,13 +37,16 @@ pipeline {
             steps {
                 unstash 'build-artifact'
                 sh '''
-                    echo '---deploy stage---'
+                     echo "---deploy stage---"
                     npm install netlify-cli node-jq
                     node_modules/.bin/netlify --version
                     echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
-                    echo "TOKEN: $NETLIFY_AUTH_TOKEN"
                     node_modules/.bin/netlify status
-                     ls -la build || echo "❌ build folder not found!"
+
+                    echo "🔥 Checking build folder..."
+                    ls -la build || echo "❌ build folder not found!"
+
+                    echo "🚀 Starting deploy..."
                     node_modules/.bin/netlify deploy --dir=build --json
                 '''
             }
