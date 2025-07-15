@@ -28,20 +28,20 @@ pipeline {
         stage('deploy staging') {                     
             agent {
                  docker {
-                     image 'mcr.microsoft.com/playwright:v1.39.0-jammy'   
+                     image 'node:18-alpine'   
                      reuseNode true           
                   }
             }
             steps {
                sh '''
                   echo '---deploy stage---'
-                  ls -la
-                  ls build
+                  npm ci
+                  npm run build
                   npm install netlify-cli node-jq
                   node_modules/.bin/netlify --version 
                   echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
                   node_modules/.bin/netlify status
-                  node_modules/.bin/netlify deploy --dir=build --prod
+                  node_modules/.bin/netlify deploy --dir=build --json
                  '''
              }
          }
