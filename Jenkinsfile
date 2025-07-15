@@ -11,7 +11,8 @@ pipeline {
                             agent {
                                 docker {
                                     image 'node:18-alpine'
-                                    args "-v ${env.WORKSPACE}/build:/build -w /build"
+                                    args "-v '${env.WORKSPACE}/build:/build' -w /build"
+
                                     reuseNode true
                                 }
                             }
@@ -30,7 +31,8 @@ pipeline {
             agent {
                  docker {
                      image 'node:18-alpine' 
-                    args "-v ${env.WORKSPACE}/build:/build -w /build"
+                    args "-v '${env.WORKSPACE}/build:/build' -w /build"
+
                      reuseNode true           
                   }
             }
