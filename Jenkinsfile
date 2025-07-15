@@ -49,18 +49,19 @@ pipeline {
 
                     # Export token ให้ CLI อ่านได้
                     export NETLIFY_AUTH_TOKEN=$NETLIFY_AUTH_TOKEN
+                    echo "TOKEN=$NETLIFY_AUTH_TOKEN"    
 
-                    # เชื่อม site กับ Netlify
-                    echo "🔗 Linking Netlify project..."
+                    echo "🔗 Linking project"
                     node_modules/.bin/netlify link --id=$NETLIFY_SITE_ID || echo "❌ Link failed"
 
-                    # ตรวจสอบ status
-                    echo "📊 Netlify status:"
-                    node_modules/.bin/netlify status || echo "❌ Status failed"
-
-                    # Deploy
-                    echo "🚀 Deploying to Netlify..."
-                    node_modules/.bin/netlify deploy --dir=build --prod --json --debug || echo "❌ Deploy failed"
+                    echo "🚀 Deploying..."
+                    node_modules/.bin/netlify deploy \
+                      --dir=build \
+                      --prod \
+                      --json \
+                      --debug \
+                      --auth=$NETLIFY_AUTH_TOKEN \
+                      --site=$NETLIFY_SITE_ID || echo "❌ Deploy failed"
                 '''
             }
         }
