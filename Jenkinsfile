@@ -47,7 +47,7 @@ pipeline {
                     ls -la build || echo "❌ build folder not found!"
 
                     echo "🚀 Starting deploy..."
-                    node_modules/.bin/netlify deploy --dir=build --json
+                    node_modules/.bin/netlify deploy --dir=build --json --debug
                 '''
             }
         }
