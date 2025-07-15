@@ -25,26 +25,42 @@ pipeline {
                 stash includes: 'build/**', name: 'build-artifact'
             }
         }
-stage('deploy staging') {
-  agent {
-    docker {
-      image 'node:18-alpine'
-      reuseNode true
-    }
-  }
-  steps {
-    sh '''
-      # ติดตั้งเครื่องมือพื้นฐานให้ alpine
-      apk add --no-cache bash curl git python3 make g++ libc6-compat
 
-      npm install netlify-cli node-jq
-      node_modules/.bin/netlify --version
+        stage('deploy staging') {
+            agent {
+                docker {
+                image 'node:18-alpine'
+                args "-v $WORKSPACE:/workspace -w /workspace"
+                reuseNode true
+                }
+            }
+            steps {
+                unstash 'build-artifact'
+                sh '''
+                echo "🌍 Current workspace: $PWD"
+echo "🔐 NETLIFY_SITE_ID=$NETLIFY_SITE_ID"
+echo "🔐 NETLIFY_AUTH_TOKEN=${NETLIFY_AUTH_TOKEN:0:6}********"
+echo "--- 📦 Checking files ---"
+ls -la
+ls -la build || echo "❌ build folder missing"
+cat build/index.html || echo "⚠️ index.html not found"
 
-      node_modules/.bin/netlify link --id=$NETLIFY_SITE_ID
-      node_modules/.bin/netlify status
-      node_modules/.bin/netlify deploy --dir=build --prod --json --debug
-    '''
-  }
-}
+echo "🛠 Installing netlify-cli + node-jq"
+npm install netlify-cli node-jq
+
+echo "🔗 netlify version check"
+node_modules/.bin/netlify --version
+
+echo "🔗 Linking project to Netlify..."
+node_modules/.bin/netlify link --id=$NETLIFY_SITE_ID || echo "❌ link failed"
+
+echo "📦 Checking Netlify status..."
+node_modules/.bin/netlify status || echo "❌ status failed"
+
+echo "🚀 Deploying..."
+node_modules/.bin/netlify deploy --dir=build --prod --json --debug || echo "❌ deploy failed"
+                '''
+            }
+        }
     }
 }
