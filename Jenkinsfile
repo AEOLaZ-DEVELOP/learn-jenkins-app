@@ -22,8 +22,8 @@ pipeline {
                                     npm ci
                                     npm run build
                                     ls -la
-                                    stash includes: 'build/**', name: 'build-artifact'
                                 '''
+                                stash includes: 'build/**', name: 'build-artifact'
                             }
                         }
         stage('deploy staging') {                     
