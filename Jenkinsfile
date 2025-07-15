@@ -16,7 +16,7 @@ pipeline {
                             }
                             steps {
                                 sh '''
-                                    ls -la
+                                    cat /etc/hostsname
                                     node --version
                                     npm --version
                                     npm ci
@@ -34,6 +34,7 @@ pipeline {
             }
             steps {
                sh '''
+                  echo '---deploy stage---'
                   ls -la
                   ls build
                   npm install netlify-cli node-jq
