@@ -25,33 +25,26 @@ pipeline {
                 stash includes: 'build/**', name: 'build-artifact'
             }
         }
+stage('deploy staging') {
+  agent {
+    docker {
+      image 'node:18-alpine'
+      reuseNode true
+    }
+  }
+  steps {
+    sh '''
+      # ติดตั้งเครื่องมือพื้นฐานให้ alpine
+      apk add --no-cache bash curl git python3 make g++ libc6-compat
 
-        stage('deploy staging') {
-            agent {
-                docker {
-                image 'node:18-alpine'
-                args "-v $WORKSPACE:/workspace -w /workspace"
-                reuseNode true
-                }
-            }
-            steps {
-                unstash 'build-artifact'
-                sh '''
-                echo "🚀 deploy stage ---"
-                npm install netlify-cli node-jq
-                node_modules/.bin/netlify --version
-                echo "🔐 Linking Netlify project..."
-                node_modules/.bin/netlify link --id=$NETLIFY_SITE_ID
-                echo "🌐 Deploying to production. Site ID: $NETLIFY_SITE_ID"
-                node_modules/.bin/netlify status
+      npm install netlify-cli node-jq
+      node_modules/.bin/netlify --version
 
-                echo "📂 Checking build folder..."
-                ls -la build || echo "❌ build folder not found!"
-
-                echo "🚀 Starting deploy..."
-                node_modules/.bin/netlify deploy --dir=build --prod --json --debug
-                '''
-            }
-        }
+      node_modules/.bin/netlify link --id=$NETLIFY_SITE_ID
+      node_modules/.bin/netlify status
+      node_modules/.bin/netlify deploy --dir=build --prod --json --debug
+    '''
+  }
+}
     }
 }
