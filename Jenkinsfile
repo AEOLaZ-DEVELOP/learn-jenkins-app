@@ -26,26 +26,26 @@ pipeline {
                                 stash includes: 'build/**', name: 'build-artifact'
                             }
                         }
-        stage('deploy staging') {                     
+        stage('deploy staging') {
             agent {
-                 docker {
-                     image 'node:18-alpine' 
-                     reuseNode true           
-                  }
+                docker {
+                    image 'node:18-alpine'
+                    args '-v $WORKSPACE:/workspace -w /workspace'
+                    reuseNode true
+                }
             }
             steps {
-                dir("${env.WORKSPACE}") {
-                        unstash 'build-artifact'
-                    }
-               sh '''
-                  echo '---deploy stage---'
-                  npm install netlify-cli node-jq
-                  node_modules/.bin/netlify --version 
-                  echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
-                  node_modules/.bin/netlify status
-                  node_modules/.bin/netlify deploy --dir=build --json
-                 '''
-             }
-         }
+                unstash 'build-artifact'
+                sh '''
+                    echo '---deploy stage---'
+                    npm install netlify-cli node-jq
+                    node_modules/.bin/netlify --version
+                    echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
+                    node_modules/.bin/netlify status
+                    node_modules/.bin/netlify deploy --dir=build --json
+                '''
+            }
+        }
+
     }
 }
