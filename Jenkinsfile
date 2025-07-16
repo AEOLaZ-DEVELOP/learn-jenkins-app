@@ -25,7 +25,7 @@ pipeline {
                     npm run build
                     ls -la
                 '''
-                stash includes: 'build/**, .netlify/**', name: 'build-artifacts'
+                stash includes: 'build/**, .netlify/**', name: 'build-artifacts', allowEmptyArchive: true
             }
         }
         stage('deploy staging') {                     
