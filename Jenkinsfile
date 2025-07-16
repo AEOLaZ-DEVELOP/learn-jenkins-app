@@ -17,13 +17,14 @@ pipeline {
             steps {
                 sh '''
                     echo "🔧 Building..."
-                    node --version
-                    npm --version
+                    rm -rf .netlify
+                    npm install netlify-cli
+                    node_modules/.bin/netlify link --id=$NETLIFY_SITE_ID --json --debug
                     npm ci
                     npm run build
                     ls -la
                 '''
-                 stash includes: 'build/**', name: 'build-artifacts'
+                 stash includes: 'build/**', name: 'build-artifacts', allowEmpty: true
             }
         }
         stage('deploy staging') {                     
@@ -37,16 +38,11 @@ pipeline {
                 unstash 'build-artifacts'
                 sh '''
                     echo "🚀 Deploying to Netlify..."
-                    npm install netlify-cli
-
-                    ls -la build || echo "⚠️ build folder not found"
-                    node_modules/.bin/netlify --version
-
-                    node_modules/.bin/netlify deploy \
-                        --dir=build \
-                        --auth=$NETLIFY_AUTH_TOKEN \
-                        --site=$NETLIFY_SITE_ID \
-                        --json --debug
+                    ls -la .netlify || echo "⚠️ ยังไม่มีไฟล์ลิงก์"
+                    node_modules/.bin/netlify deploy --dir=build \
+                    --auth=$NETLIFY_AUTH_TOKEN \
+                    --site=$NETLIFY_SITE_ID \
+                    --json
                 '''
                 // script {
                 //     env.staging_url = sh (
