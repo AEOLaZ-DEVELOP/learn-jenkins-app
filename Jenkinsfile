@@ -45,7 +45,7 @@ pipeline {
                 '''
                 script {
                     env.staging_url = sh (
-                    script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json",        ✨ script ในที่นี้คือ key (named arguments) ที่เก็บ shell command ไม่ใช่ script block (script {...}) โดย sh(...)คือ function ที่ run command ที่อยู่ใน key (name arguments)
+                    script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json",  
                     returnStdout: true
                     ).trim()
                 }
