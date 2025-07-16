@@ -84,7 +84,7 @@ pipeline {
                                 }
                             }
                             environment {
-                                CI_ENVIRONMENT_URL = 'YOUR NETLIFY SITE URL'                                                                    
+                                CI_ENVIRONMENT_URL = ' '                                                                    
                             }
                             steps {
                                 sh '''
@@ -121,12 +121,12 @@ pipeline {
                                 }
                             }
                             environment {
-                                    CI_ENVIRONMENT_URL = 'YOUR NETLIFY SITE URL'
+                                    CI_ENVIRONMENT_URL = ' '
                             }
                             steps {
                                 sh '''
                                     node --version
-                                    npm install netlify-cli
+                                    npm install netlify-cli@17.17.0
                                     node_modules/.bin/netlify --version
                                     echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
                                     node_modules/.bin/netlify status
