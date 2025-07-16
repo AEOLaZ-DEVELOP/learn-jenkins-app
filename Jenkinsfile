@@ -16,22 +16,14 @@ pipeline {
             }
             steps {
                 sh '''
+                    echo "🔧 Building..."
                     node --version
                     npm --version
-                    # ลบ .netlify เดิมก่อน (กัน state เสีย)
-                    rm -rf .netlify
-
-                    # ทำการ link ใหม่แบบ CLI
-                    node_modules/.bin/netlify link --id=$NETLIFY_SITE_ID || echo "⚠️ Link failed (อาจเคย link แล้ว)"
-
-                    # ตรวจสอบ .netlify/state.json ว่ามีจริงไหม
-                    cat .netlify/state.json || echo "⚠️ ยังไม่ได้ link จริง"
                     npm ci
-                    npm install
                     npm run build
                     ls -la
                 '''
-                stash includes: 'build/**, .netlify/**', name: 'build-artifacts', allowEmpty: true
+                 stash includes: 'build/**', name: 'build-artifacts'
             }
         }
         stage('deploy staging') {                     
@@ -44,10 +36,12 @@ pipeline {
             steps {
                 unstash 'build-artifacts'
                 sh '''
+                    echo "🚀 Deploying to Netlify..."
                     npm install netlify-cli
-                    ls -la build
-                    ls -la .netlify || echo "❌ .netlify not found"
-                    node_modules/.bin/netlify status || echo "🔍 status failed"
+
+                    ls -la build || echo "⚠️ build folder not found"
+                    node_modules/.bin/netlify --version
+
                     node_modules/.bin/netlify deploy \
                         --dir=build \
                         --auth=$NETLIFY_AUTH_TOKEN \
