@@ -41,7 +41,7 @@ pipeline {
                     node_modules/.bin/netlify --version 
                     echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
                     node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json
+                    node_modules/.bin/netlify deploy --dir=build  --site=$NETLIFY_SITE_ID --json
                 '''
                 script {
                     env.staging_url = sh (
