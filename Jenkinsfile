@@ -17,10 +17,6 @@ pipeline {
             steps {
                 sh '''
                     echo "🔧 Building..."
-                    rm -rf .netlify
-                    npm install netlify-cli
-                    # ✅ ใช้ netlify link แบบ interactive mode แทน
-                    echo "$NETLIFY_SITE_ID" | node_modules/.bin/netlify link --id=$NETLIFY_SITE_ID
                     npm ci
                     npm run build
                     ls -la
@@ -38,12 +34,9 @@ pipeline {
             steps {
                 unstash 'build-artifacts'
                 sh '''
-                    echo "🚀 Deploying to Netlify..."
-                    ls -la .netlify || echo "⚠ ยังไม่ได้ link จริงๆ
-                    node_modules/.bin/netlify deploy --dir=build \
-                    --auth=$NETLIFY_AUTH_TOKEN \
-                    --site=$NETLIFY_SITE_ID \
-                    --json
+                    echo "🔧 deploy..."
+                    ls -la
+                    ls build
                 '''
                 // script {
                 //     env.staging_url = sh (
