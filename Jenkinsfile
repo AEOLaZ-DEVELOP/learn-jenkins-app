@@ -10,7 +10,7 @@ pipeline {
         stage('Build') {
             agent {
                 docker {
-                    image 'node:18-alpine'
+                    image 'node:18'
                     reuseNode true
                 }
             }
@@ -30,7 +30,7 @@ pipeline {
         stage('deploy staging') {                     
             agent {
                 docker {
-                    image 'node:18-alpine'   
+                    image 'node:18'   
                     reuseNode true           
                 }
             }
@@ -43,12 +43,12 @@ pipeline {
                     node_modules/.bin/netlify status
                     node_modules/.bin/netlify deploy --dir=build --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID --json --debug
                 '''
-                script {
-                    env.staging_url = sh (
-                    script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json",  
-                    returnStdout: true
-                    ).trim()
-                }
+                // script {
+                //     env.staging_url = sh (
+                //     script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json",  
+                //     returnStdout: true
+                //     ).trim()
+                // }
             }
         }
     }
