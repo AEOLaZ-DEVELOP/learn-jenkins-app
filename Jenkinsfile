@@ -33,12 +33,13 @@ pipeline {
             steps {
                 sh '''
                     echo "🔧 deploy..."
-                    npm install netlify-cli@17.17.0
+                    npm install netlify-cli
                     node_modules/.bin/netlify --version
                     node_modules/.bin/netlify status
                     node_modules/.bin/netlify deploy --dir=build --prod
                 '''
                 // script {
+                    // npm install netlify-cli@17.17.0
                 //     env.staging_url = sh (
                 //     script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json",  
                 //     returnStdout: true
