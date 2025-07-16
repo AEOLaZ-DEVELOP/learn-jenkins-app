@@ -8,32 +8,47 @@ pipeline {
 
     stages {
         stage('Build') {
-        agent {
-            docker {
-                image 'node:18-alpine'
-                reuseNode true
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                    ls -la
+                    node --version
+                    npm --version
+                    npm ci
+                    npm install
+                    npm run build
+                    ls -la
+                '''
+                stash includes: 'build/**', name: 'build-artifacts'
             }
         }
-        steps {
-            sh '''
-            node --version
-            npm --version
-            npm ci
-            npm run build
-            ls -la
-            npm install netlify-cli node-jq
-            node_modules/.bin/netlify --version 
-            node_modules/.bin/netlify link --id=$NETLIFY_SITE_ID
-            echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
-            node_modules/.bin/netlify status
-            node_modules/.bin/netlify deploy \
-  --auth="$NETLIFY_AUTH_TOKEN" \
-  --site="$NETLIFY_SITE_ID" \
-  --dir=build \
-  --prod \
-  --json \
-  --debug
-            '''
+        stage('deploy staging') {                     
+            agent {
+                docker {
+                    image 'node:18-alpine'   
+                    reuseNode true           
+                }
+            }
+            steps {
+                unstash 'build-artifacts'
+                sh '''
+                    npm install netlify-cli node-jq
+                    node_modules/.bin/netlify --version 
+                    echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
+                    node_modules/.bin/netlify status
+                    node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json
+                '''
+                script {
+                    env.staging_url = sh (
+                    script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json",        ✨ script ในที่นี้คือ key (named arguments) ที่เก็บ shell command ไม่ใช่ script block (script {...}) โดย sh(...)คือ function ที่ run command ที่อยู่ใน key (name arguments)
+                    returnStdout: true
+                    ).trim()
+                }
             }
         }
     }
