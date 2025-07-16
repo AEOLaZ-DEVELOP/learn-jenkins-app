@@ -21,7 +21,6 @@ pipeline {
                     npm run build
                     ls -la
                 '''
-                 stash includes: 'build/**', name: 'build-artifacts', allowEmpty: true
             }
         }
         stage('deploy staging') {                     
@@ -34,7 +33,7 @@ pipeline {
             steps {
                 sh '''
                     echo "🔧 deploy..."
-                    npm install netlify-cli
+                    npm install netlify-cli@17.17.0
                     node_modules/.bin/netlify --version
                     node_modules/.bin/netlify status
                     node_modules/.bin/netlify deploy --dir=build --prod
