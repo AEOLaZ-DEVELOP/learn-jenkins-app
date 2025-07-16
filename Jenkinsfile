@@ -19,7 +19,7 @@ pipeline {
                     echo "🔧 Building..."
                     rm -rf .netlify
                     npm install netlify-cli
-                    node_modules/.bin/netlify link --id=$NETLIFY_SITE_ID --json --debug
+                    node_modules/.bin/netlify link --id=$NETLIFY_SITE_ID --debug
                     npm ci
                     npm run build
                     ls -la
