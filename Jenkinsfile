@@ -16,15 +16,16 @@ pipeline {
             }
             steps {
                 sh '''
-                    ls -la
                     node --version
                     npm --version
+                    npm install netlify-cli
+                    node_modules/.bin/netlify link --id=$NETLIFY_SITE_ID
                     npm ci
                     npm install
                     npm run build
                     ls -la
                 '''
-                stash includes: 'build/**', name: 'build-artifacts'
+                stash includes: 'build/**, .netlify/**', name: 'build-artifacts'
             }
         }
         stage('deploy staging') {                     
@@ -37,14 +38,15 @@ pipeline {
             steps {
                 unstash 'build-artifacts'
                 sh '''
-                    echo "🔗 Linking Netlify project..."
-                    netlify link --id=$NETLIFY_SITE_ID
-                    npm install netlify-cli node-jq
-                    node_modules/.bin/netlify --version 
-                    echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
-                    node_modules/.bin/netlify status
-                    echo "🚀 Deploying..."
-                    node_modules/.bin/netlify deploy --dir=build --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID --json --debug
+                    npm install netlify-cli
+                    ls -la build
+                    ls -la .netlify || echo "❌ .netlify not found"
+                    node_modules/.bin/netlify status || echo "🔍 status failed"
+                    node_modules/.bin/netlify deploy \
+                        --dir=build \
+                        --auth=$NETLIFY_AUTH_TOKEN \
+                        --site=$NETLIFY_SITE_ID \
+                        --json --debug
                 '''
                 // script {
                 //     env.staging_url = sh (
