@@ -82,12 +82,12 @@ pipeline {
                         stage('deploy staging') {                     
                             agent {
                                 docker {
-                                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'                                      ✨ ใช้ image ที่มี tools พร้อมใช้งานแล้วของ microsoft
+                                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'                                      
                                     reuseNode true           
                                 }
                             }
                             environment {
-                                CI_ENVIRONMENT_URL = ' '                                                                    ✨ กำหนดค่า CI_ENVIRONMENT_URL ให้มีค่าเริ่มต้นเป็น ' '
+                                CI_ENVIRONMENT_URL = ' '                                                                    
                             }
                             steps {
                                 sh '''
