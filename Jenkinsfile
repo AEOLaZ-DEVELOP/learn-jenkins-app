@@ -14,6 +14,7 @@ pipeline {
                             }
                             steps {
                                 sh '''
+                                    echo "💥 stage build"
                                     ls -la
                                     node --version
                                     npm --version
@@ -34,6 +35,7 @@ pipeline {
                                     }
                                     steps {
                                         sh '''
+                                            echo "💥 stage unit tests"
                                             #test -f build/index.html
                                             npm test
                                         '''
@@ -54,6 +56,7 @@ pipeline {
 
                                     steps {
                                         sh '''
+                                            echo "💥 stage E2E"
                                             npm install serve
                                             node_modules/.bin/serve -s build &
                                             sleep 10
@@ -79,15 +82,16 @@ pipeline {
                         stage('deploy staging') {                     
                             agent {
                                 docker {
-                                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'                                      
+                                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'                                      ✨ ใช้ image ที่มี tools พร้อมใช้งานแล้วของ microsoft
                                     reuseNode true           
                                 }
                             }
                             environment {
-                                CI_ENVIRONMENT_URL = ' '                                                                    
+                                CI_ENVIRONMENT_URL = ' '                                                                    ✨ กำหนดค่า CI_ENVIRONMENT_URL ให้มีค่าเริ่มต้นเป็น ' '
                             }
                             steps {
                                 sh '''
+                                    echo "💥 stage deploy staging"
                                     npm install netlify-cli@17.17.0 node-jq
                                     node_modules/.bin/netlify --version
                                     echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
@@ -120,8 +124,12 @@ pipeline {
                         //              reuseNode true  
                         //         }
                         //     }
+                        //     environment {
+                        //             CI_ENVIRONMENT_URL = '  '
+                        //     }
                         //     steps {
                         //         sh '''
+                        //             echo "💥 stage deploy prod"
                         //             node --version
                         //             npm install netlify-cli@17.17.0
                         //             node_modules/.bin/netlify --version
@@ -147,5 +155,5 @@ pipeline {
                         //         }
                         //     }
                         // }
-                    }    
+                    }       
                 } 
