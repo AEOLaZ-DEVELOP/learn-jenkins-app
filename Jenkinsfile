@@ -125,9 +125,6 @@ pipeline {
                                      reuseNode true  
                                 }
                             }
-                            environment {
-                                    CI_ENVIRONMENT_URL = '  '
-                            }
                             steps {
                                 sh '''
                                     echo "💥 stage deploy prod"
