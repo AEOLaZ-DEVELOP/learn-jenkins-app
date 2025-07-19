@@ -3,7 +3,8 @@
                     environment {                                                               
                         NETLIFY_SITE_ID = 'f0a528e5-4c88-46d0-b60b-f999e41f4092'                
                         NETLIFY_AUTH_TOKEN = credentials('netlify-token')  
-                        REACT_APP_VERSION  = "1.0.$BUILD_ID"                                                                     
+                        REACT_APP_VERSION  = "1.0.$BUILD_ID"  
+                    }                                                                   
                     stages {
                         stage('Docker') {
                             steps {
@@ -158,4 +159,4 @@
                         }
                     }    
                 }
-            } 
+            
