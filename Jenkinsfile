@@ -96,7 +96,7 @@
                                     netlify --version                                               
                                     netlify status                                                  
                                     netlify deploy --dir=build --json > deploy-output.json
-                                    export CI_ENVIRONMENT_URL=$(node-jq -r '.deploy_url' deploy-output.json)   
+                                    export CI_ENVIRONMENT_URL=$(jq -r '.deploy_url' deploy-output.json)   
                                     npx playwright test  --reporter=html
                                 '''
                                 }
@@ -130,7 +130,7 @@
                                 sh '''
                                     echo "💥 stage deploy prod"
                                     netlify --version                                               
-                                    export CI_ENVIRONMENT_URL=$(node-jq -r '.deploy_url' deploy-output.json)    
+                                    export CI_ENVIRONMENT_URL=$(jq -r '.deploy_url' deploy-output.json)    
                                     netlify deploy --dir=build --prod                               
                                     npx playwright test  --reporter=html                     
                                 '''
