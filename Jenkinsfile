@@ -26,6 +26,9 @@
                                            --region ap-southeast-1 \
                                             s3 rb s3://dev-artifact
 
+                                        echo "👉 create bucket on localstack"
+                                        aws --endpoint-url=http://192.168.88.245:4566 s3 mb s3://dev-artifact
+                                        
                                         echo "🚀 upload artifact to bucket on localstack"
                                         echo "Hello S3!" > index.html
                                         aws --endpoint-url=http://192.168.88.245:4566 s3 cp index.html s3://dev-artifact/    
