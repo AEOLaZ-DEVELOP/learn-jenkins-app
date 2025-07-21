@@ -20,7 +20,6 @@
                                         passwordVariable: 'AWS_SECRET_ACCESS_KEY',
                                         usernameVariable: 'AWS_ACCESS_KEY_ID'
                                     )
-                                    )
                                 ]) {
                                     sh '''
                                         echo "✅ ตรวจสอบเวอร์ชัน AWS CLI"
