@@ -32,7 +32,8 @@
                                         aws --endpoint-url=http://192.168.88.245:4566 --region ap-southeast-1 s3 mb s3://dev-artifact               
 
                                         echo "🚀 upload artifact to bucket on localstack"
-                                        aws --endpoint-url=http://192.168.88.245:4566 s3 cp build.zip s3://dev-artifact/    
+                                        echo "Hello S3!" > index.html
+                                        aws --endpoint-url=http://192.168.88.245:4566 s3 cp index.html s3://dev-artifact/    
                                         
                                         echo "👉 check list bucket on localstack"
                                         aws --endpoint-url=http://192.168.88.245:4566 --region ap-southeast-1 s3 mb s3://dev-artifact 
