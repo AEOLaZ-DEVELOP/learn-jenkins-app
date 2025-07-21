@@ -22,11 +22,24 @@
                                     )
                                 ]) {
                                     sh '''
-                                        aws --endpoint-url=http://192.168.88.245:4566 \
-    --region ap-southeast-1 \
-    s3 rm s3://dev-artifact --recursive
+                                        echo "✅ ตรวจสอบเวอร์ชัน AWS CLI"
+                                        aws --version
 
+                                        echo "✅ list bucket localstack (--endpoint-url)"
+                                        aws --endpoint-url=http://192.168.88.245:4566 s3 ls
                                         
+                                        echo "👉 check list bucket on localstack"
+                                        aws --endpoint-url=http://192.168.88.245:4566 --region ap-southeast-1 s3 mb s3://dev-artifact               
+
+                                        echo "🚀 upload artifact to bucket on localstack"
+                                        echo "Hello S3!" > index.html
+                                        aws --endpoint-url=http://192.168.88.245:4566 s3 cp index.html s3://dev-artifact/    
+                                        
+                                        echo "👉 check list bucket on localstack"
+                                        aws --endpoint-url=http://192.168.88.245:4566 --region ap-southeast-1 s3 mb s3://dev-artifact 
+                                        
+                                        echo "✅ list bucket localstack (--endpoint-url)"
+                                        aws --endpoint-url=http://192.168.88.245:4566 s3 ls
                                     '''
                                 }
                             }
