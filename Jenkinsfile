@@ -6,7 +6,7 @@
                         REACT_APP_VERSION  = "1.0.$BUILD_ID"  
                     }                                                                   
                     stages {
-                        stage('AWS') {
+                        stage('aws') {
                             agent {
                                 docker {
                                     image 'amazon/aws-cli'
@@ -14,12 +14,25 @@
                                 }
                             }
                             steps {
-                                sh '''
-                                    aws --version
-                                '''
+                                withCredentials([
+                                    usernamePassword(
+                                        credentialsId: 'localstack-aws', 
+                                        passwordVariable: 'AWS_SECRET_ACCESS_KEY',
+                                        usernameVariable: 'AWS_ACCESS_KEY_ID'
+                                    )
+                                ]) {
+                                    sh '''
+                                        echo "✅ ตรวจสอบเวอร์ชัน AWS CLI"
+                                        aws --version
+
+                                        echo "✅ list bucket localstack"
+                                        aws s3 ls                                                       
+
+                                    '''
+                                }
                             }
                         }
-                        // stage('Build') {
+                        // stage('build') {
                         //     agent {
                         //         docker {
                         //             image 'node:18-alpine'
@@ -38,9 +51,9 @@
                         //         '''
                         //     }
                         // }
-                        // stage('Tests') {
+                        // stage('test') {
                         //     parallel {
-                        //         stage('Unit tests') {
+                        //         stage('unit tests') {
                         //             agent {
                         //                 docker {
                         //                     image 'node:18-alpine'
@@ -60,7 +73,7 @@
                         //                 }
                         //             }
                         //         }
-                        //         stage('E2E') {
+                        //         stage('e2e') {
                         //             agent {
                         //                 docker {
                         //                     image 'my-playwright'
