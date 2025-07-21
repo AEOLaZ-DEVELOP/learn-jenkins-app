@@ -25,8 +25,8 @@
                                         echo "✅ ตรวจสอบเวอร์ชัน AWS CLI"
                                         aws --version
 
-                                        echo "✅ list bucket localstack"
-                                        aws s3 ls
+                                         echo "✅ list bucket localstack (--endpoint-url)"
+                                        aws --endpoint-url=http://192.168.88.245:4566 s3 ls
                                     '''
                                 }
                             }
