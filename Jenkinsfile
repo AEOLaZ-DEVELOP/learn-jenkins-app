@@ -26,7 +26,7 @@
                                         aws --version
 
                                         echo "✅ list bucket localstack"
-
+                                        aws s3 ls
                                     '''
                                 }
                             }
