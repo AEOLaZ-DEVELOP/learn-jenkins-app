@@ -21,22 +21,33 @@
                                         usernameVariable: 'AWS_ACCESS_KEY_ID'
                                     )
                                 ]) {
-                                    sh '''
-                                        aws --endpoint-url=http://192.168.88.245:4566 \
-                                           --region ap-southeast-1 \
-                                            s3 rb s3://dev-artifact
+                                    script {
+                                        def bucketName = 'dev-artifact'
+                                        def endpoint = 'http://192.168.88.245:4566'
+                                        def region = 'ap-southeast-1'
 
-                                        echo "👉 create bucket on localstack"
-                                        aws --endpoint-url=http://192.168.88.245:4566 s3 mb s3://dev-artifact
-                                        
-                                        echo "🚀 upload artifact to bucket on localstack"
-                                        echo "Hello S3!" > index.html
-                                        aws --endpoint-url=http://192.168.88.245:4566 s3 cp index.html s3://dev-artifact/    
-                                         
-                                        
-                                        echo "✅ list bucket localstack (--endpoint-url)"
-                                        aws --endpoint-url=http://192.168.88.245:4566 s3 ls
-                                    '''
+                                        // ตรวจสอบว่ามี bucket หรือไม่
+                                        def checkBucket = sh(
+                                            echo "✅ check list bucket localstack ${bucketName}"                            
+                                            script: "aws --endpoint-url=${endpoint} s3 ls s3://${bucketName}",
+                                            returnStatus: true                                                              
+                                        )
+
+                                        if (checkBucket == 0) {
+                                            echo "❌ Bucket ${bucketName} found. Deleting..."
+                                            sh "aws --endpoint-url=${endpoint} \
+                                                    --region ${region} 
+                                                    s3 rb s3://${bucketName} --force"                                       
+                                        } else {
+                                            sh '''
+                                                echo "🚀 upload artifact to bucket on localstack"
+                                                echo "Hello S3!" > index.html
+                                                aws --endpoint-url=${endpoint}s3 cp index.html s3://${bucketName}/
+
+                                                echo "✅ check list bucket localstack"
+                                                aws --endpoint-url=${endpoint} s3 ls "  
+                                            '''
+                                    }
                                 }
                             }
                         }
