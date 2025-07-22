@@ -35,9 +35,8 @@
                                         if (checkBucket == 0) {
                                             sh '''
                                                 echo "❌ Bucket ${bucketName} found. Deleting..."
-                                                "aws --endpoint-url=${endpoint} \
-                                                     --region ${region}\ 
-                                                     s3 rb s3://${bucketName} --force"
+                                                aws --endpoint-url=${endpoint} \
+                                                    --region ${region} s3 rb s3://${bucketName} --force
                                             '''                                       
                                         } else {
                                             sh '''
