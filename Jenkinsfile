@@ -33,10 +33,12 @@
                                         )
 
                                         if (checkBucket == 0) {
-                                            echo "❌ Bucket ${bucketName} found. Deleting..."
-                                            sh "aws --endpoint-url=${endpoint} \
-                                                    --region ${region} 
-                                                    s3 rb s3://${bucketName} --force"                                       
+                                            sh '''
+                                                echo "❌ Bucket ${bucketName} found. Deleting..."
+                                                "aws --endpoint-url=${endpoint} \
+                                                     --region ${region}\ 
+                                                     s3 rb s3://${bucketName} --force"
+                                            '''                                       
                                         } else {
                                             sh '''
                                                 echo "🚀 upload artifact to bucket on localstack"
@@ -46,10 +48,10 @@
                                                 echo "✅ check list bucket localstack"
                                                 aws --endpoint-url=${endpoint} s3 ls "  
                                             '''
+                                        }
                                     }
                                 }
                             }
-                        }
                         // stage('build') {
                         //     agent {
                         //         docker {
