@@ -28,7 +28,7 @@
 
                                         // ตรวจสอบว่ามี bucket หรือไม่
                                         def checkBucket = sh(                           
-                                            script: "aws --endpoint-url=${endpoint} s3 ls s3://${bucketName}",
+                                            script: "aws --endpoint-url=$endpoint s3 ls s3://$bucketName",
                                             returnStatus: true                                                              
                                         )
 
