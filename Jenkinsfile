@@ -40,6 +40,9 @@
                                             '''                                       
                                         } else {
                                             sh '''
+                                                echo "👉 create bucket on localstack"
+                                                aws --endpoint-url=$endpoint s3 mb s3://$bucketName
+
                                                 echo "🚀 upload artifact to bucket on localstack"
                                                 echo "Hello S3!" > index.html
                                                 aws --endpoint-url=$endpoint s3 cp index.html s3://$bucketName/
