@@ -36,16 +36,16 @@
                                             sh '''
                                                 echo "❌ Bucket ${bucketName} found. Deleting..."
                                                 aws --endpoint-url=${endpoint} \
-                                                    --region ${region} s3 rb s3://${bucketName} --force
+                                                    --region $region s3 rb s3://$bucketName --force
                                             '''                                       
                                         } else {
                                             sh '''
                                                 echo "🚀 upload artifact to bucket on localstack"
                                                 echo "Hello S3!" > index.html
-                                                aws --endpoint-url=${endpoint}s3 cp index.html s3://${bucketName}/
+                                                aws --endpoint-url=$endpoint s3 cp index.html s3://$bucketName/
 
                                                 echo "✅ check list bucket localstack"
-                                                aws --endpoint-url=${endpoint} s3 ls "  
+                                                aws --endpoint-url=$endpoint s3 ls "  
                                             '''
                                         }
                                     }
