@@ -27,8 +27,7 @@
                                         def region = 'ap-southeast-1'
 
                                         // ตรวจสอบว่ามี bucket หรือไม่
-                                        def checkBucket = sh(
-                                            echo "✅ check list bucket localstack ${bucketName}"                            
+                                        def checkBucket = sh(                           
                                             script: "aws --endpoint-url=${endpoint} s3 ls s3://${bucketName}",
                                             returnStatus: true                                                              
                                         )
