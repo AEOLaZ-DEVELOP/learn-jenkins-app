@@ -51,6 +51,7 @@
                                     }
                                 }
                             }
+                        }
                         // stage('build') {
                         //     agent {
                         //         docker {
